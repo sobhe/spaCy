@@ -147,7 +147,7 @@ class Pipe(object):
         """Initialize the pipe for training, using data exampes if available.
         If no model has been initialized yet, the model is added."""
         if self.model is True:
-            self.model = self.Model(**self.cfg)
+            self.model, self.emb = self.Model(**self.cfg)
         if hasattr(self, "vocab"):
             link_vectors_to_models(self.vocab)
         if sgd is None:
@@ -182,7 +182,7 @@ class Pipe(object):
             if self.cfg.get("pretrained_dims") and "pretrained_vectors" not in self.cfg:
                 self.cfg["pretrained_vectors"] = self.vocab.vectors.name
             if self.model is True:
-                self.model = self.Model(**self.cfg)
+                self.model, self.emb = self.Model(**self.cfg)
             try:
                 self.model.from_bytes(b)
             except AttributeError:
@@ -215,7 +215,7 @@ class Pipe(object):
             if self.cfg.get("pretrained_dims") and "pretrained_vectors" not in self.cfg:
                 self.cfg["pretrained_vectors"] = self.vocab.vectors.name
             if self.model is True:
-                self.model = self.Model(**self.cfg)
+                self.model, self.emb = self.Model(**self.cfg)
             try:
                 self.model.from_bytes(p.open("rb").read())
             except AttributeError:
@@ -1047,7 +1047,7 @@ class TextCategorizer(Pipe):
             self.cfg["pretrained_vectors"] = kwargs.get("pretrained_vectors")
             self.cfg["pretrained_dims"] = kwargs.get("pretrained_dims")
             self.require_labels()
-            self.model = self.Model(len(self.labels), **self.cfg)
+            self.model, self.emb = self.Model(len(self.labels), **self.cfg)
             link_vectors_to_models(self.vocab)
         if sgd is None:
             sgd = self.create_optimizer()

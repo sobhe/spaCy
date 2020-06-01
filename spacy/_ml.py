@@ -685,11 +685,14 @@ def build_text_classifier(nr_class, width=64, **cfg):
             >> Residual((ExtractWindow(nW=1) >> LN(Maxout(width, width * 3)))) ** depth,
             pad=depth,
         )
-        cnn_model = (
+        emb = (
             tok2vec
             >> flatten_add_lengths
             >> ParametricAttention(width)
             >> Pooling(sum_pool)
+        )
+        cnn_model = (
+            emb
             >> Residual(zero_init(Maxout(width, width)))
             >> zero_init(Affine(nr_class, width, drop_factor=0.0))
         )
@@ -709,7 +712,7 @@ def build_text_classifier(nr_class, width=64, **cfg):
         model.tok2vec = chain(tok2vec, flatten)
     model.nO = nr_class
     model.lsuv = False
-    return model
+    return model, emb
 
 
 def build_bow_text_classifier(
