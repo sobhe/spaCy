@@ -722,10 +722,11 @@ def build_bow_text_classifier(
         model = with_cpu(
             Model.ops, extract_ngrams(ngram_size, attr=ORTH) >> LinearModel(nr_class)
         )
+        emb = model
         if not no_output_layer:
             model = model >> (cpu_softmax if exclusive_classes else logistic)
     model.nO = nr_class
-    return model
+    return model, emb
 
 
 @layerize
@@ -752,10 +753,12 @@ def build_simple_cnn_text_classifier(tok2vec, nr_class, exclusive_classes=False,
             output_layer = (
                 zero_init(Affine(nr_class, tok2vec.nO, drop_factor=0.0)) >> logistic
             )
-        model = tok2vec >> flatten_add_lengths >> Pooling(mean_pool) >> output_layer
+        emb = tok2vec >> flatten_add_lengths >> Pooling(mean_pool)
+        model = emb >> output_layer
+
     model.tok2vec = chain(tok2vec, flatten)
     model.nO = nr_class
-    return model
+    return model, emb
 
 
 def build_nel_encoder(embed_width, hidden_width, ner_types, **cfg):
