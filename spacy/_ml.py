@@ -697,7 +697,7 @@ def build_text_classifier(nr_class, width=64, **cfg):
             >> zero_init(Affine(nr_class, width, drop_factor=0.0))
         )
 
-        linear_model = build_bow_text_classifier(
+        linear_model, _ = build_bow_text_classifier(
             nr_class,
             ngram_size=cfg.get("ngram_size", 1),
             exclusive_classes=cfg.get("exclusive_classes", False),
