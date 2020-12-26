@@ -1022,7 +1022,7 @@ class TextCategorizer(Pipe):
         not_missing = self.model.ops.asarray(not_missing)
         d_scores = (scores-truths) / scores.shape[0]
         d_scores *= not_missing
-        mean_square_error = (d_scores**2).sum(axis=1).mean()
+        mean_square_error = (d_scores**2).sum()/not_missing.sum()
         return float(mean_square_error), d_scores
 
     def add_label(self, label):
