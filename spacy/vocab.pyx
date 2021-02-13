@@ -46,7 +46,8 @@ cdef class Vocab:
             vice versa.
         lookups (Lookups): Container for large lookup tables and dictionaries.
         lookups_extra (Lookups): Container for optional lookup tables and dictionaries.
-        name (unicode): Optional name to identify the vectors table.
+        oov_prob (float): Default OOV probability.
+        vectors_name (unicode): Optional name to identify the vectors table.
         RETURNS (Vocab): The newly constructed object.
         """
         lex_attr_getters = lex_attr_getters if lex_attr_getters is not None else {}
@@ -315,6 +316,9 @@ cdef class Vocab:
         DOCS: https://spacy.io/api/vocab#prune_vectors
         """
         xp = get_array_module(self.vectors.data)
+        # Make sure all vectors are in the vocab
+        for orth in self.vectors:
+            self[orth]
         # Make prob negative so it sorts by rank ascending
         # (key2row contains the rank)
         priority = [(-lex.prob, self.vectors.key2row[lex.orth], lex.orth)
